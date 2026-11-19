@@ -32,7 +32,7 @@
       <p class="mode-badge" id="data-mode" hidden>Demo mode: mock data</p> <!--remove before shipping-->
     </div>
 
-    <nav class="site-nav" aria-label="Page sections">
+    <nav class="site-nav">
       <div class="wrap">
         <ul>
           <li><a href="#top-rated">Top rated</a></li>
@@ -119,30 +119,30 @@
           </div>
         </details>
 
-        <p class="results-count" id="results-count" role="status" aria-live="polite"></p>
+        <p class="results-count" id="results-count" role="status"></p>
       </form>
     </section>
 
     <!-- ================= OUTLETS ================= -->
-    <section class="section wrap" id="outlets" aria-labelledby="outlets-title">
+    <section class="section wrap" id="outlets" >
       <div class="section-head">
         <h2 id="outlets-title">Outlets</h2>
         <p class="section-sub">Pick an outlet to see only its menu.</p>
       </div>
-      <div class="outlet-grid" id="outlet-list" aria-live="polite"></div>
+      <div class="outlet-grid" id="outlet-list" ></div>
     </section>
 
     <!-- ================= MENU ================= -->
-    <section class="section wrap" id="menu" aria-labelledby="menu-title">
+    <section class="section wrap" id="menu" >
       <div class="section-head">
         <h2 id="menu-title">All items</h2>
         <p class="section-sub" id="menu-sub">Every item from every outlet.</p>
       </div>
-      <div class="item-grid" id="item-list" aria-live="polite"></div>
+      <div class="item-grid" id="item-list"></div>
     </section>
 
     <!-- ================= ABOUT ================= -->
-    <section class="section wrap about" id="about" aria-labelledby="about-title">
+    <section class="section wrap about" id="about">
       <h2 id="about-title">How it works</h2>
       <div class="about-grid">
         <article class="about-card">
@@ -183,10 +183,10 @@
   </footer>
 
   <!-- ================= ITEM DIALOG ================= -->
-  <dialog class="dialog" id="item-dialog" aria-labelledby="dialog-title">
+  <dialog class="dialog" id="item-dialog">
     <div class="dialog-inner">
-      <button type="button" class="dialog-close" id="dialog-close" aria-label="Close item details">
-        <span aria-hidden="true">&times;</span>
+      <button type="button" class="dialog-close" id="dialog-close">
+        <span>&times;</span>
       </button>
 
       <header class="dialog-head">
@@ -196,12 +196,12 @@
         <p class="dialog-rating" id="dialog-rating">No ratings yet</p>
       </header>
 
-      <section class="reviews-section" aria-labelledby="reviews-title">
+      <section class="reviews-section">
         <h3 id="reviews-title">Student reviews</h3>
-        <ul class="review-list" id="review-list" aria-live="polite"></ul>
+        <ul class="review-list" id="review-list"></ul>
       </section>
 
-      <section class="form-section" aria-labelledby="form-title">
+      <section class="form-section">
         <h3 id="form-title">Add your review</h3>
         <p class="form-note">Your name and review are public. One review per item per device.</p>
 
@@ -209,36 +209,35 @@
           <input type="hidden" name="item_id" id="review-item-id" value="" />
 
           <fieldset class="rating-field">
-            <legend>Your rating <span class="req" aria-hidden="true">*</span></legend>
+            <legend>Your rating <span class="req">*</span></legend>
             <div class="star-input">
               <input type="radio" name="rating" id="rating-5" value="5" />
-              <label for="rating-5"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">5 stars</span></label>
+              <label for="rating-5"><span class="star-glyph">&#9733;</span><span class="sr-only">5 stars</span></label>
 
               <input type="radio" name="rating" id="rating-4" value="4" />
-              <label for="rating-4"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">4 stars</span></label>
+              <label for="rating-4"><span class="star-glyph">&#9733;</span><span class="sr-only">4 stars</span></label>
 
               <input type="radio" name="rating" id="rating-3" value="3" />
-              <label for="rating-3"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">3 stars</span></label>
+              <label for="rating-3"><span class="star-glyph">&#9733;</span><span class="sr-only">3 stars</span></label>
 
               <input type="radio" name="rating" id="rating-2" value="2" />
-              <label for="rating-2"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">2 stars</span></label>
+              <label for="rating-2"><span class="star-glyph">&#9733;</span><span class="sr-only">2 stars</span></label>
 
               <input type="radio" name="rating" id="rating-1" value="1" />
-              <label for="rating-1"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">1 star</span></label>
+              <label for="rating-1"><span class="star-glyph">&#9733;</span><span class="sr-only">1 star</span></label>
             </div>
             <p class="field-error" id="rating-error" role="alert"></p>
           </fieldset>
 
           <div class="field">
-            <label for="reviewer-name">Your name <span class="req" aria-hidden="true">*</span></label>
+            <label for="reviewer-name">Your name <span class="req">*</span></label>
             <input
               type="text"
               id="reviewer-name"
               name="reviewer_name"
               maxlength="30"
               autocomplete="nickname"
-              required
-              aria-describedby="name-help name-error" />
+              required/>
             <p class="field-help" id="name-help">2 to 30 characters. Shown next to your review.</p>
             <p class="field-error" id="name-error" role="alert"></p>
           </div>
@@ -249,19 +248,18 @@
               id="review-text"
               name="review_text"
               rows="3"
-              maxlength="300"
-              aria-describedby="review-help review-error"></textarea>
+              maxlength="300"></textarea>
             <p class="field-help" id="review-help"><span id="review-count">0</span>/300 characters.</p>
             <p class="field-error" id="review-error" role="alert"></p>
           </div>
 
           <!-- Honeypot: hidden from humans, tempting for bots. -->
-          <div class="hp-field" aria-hidden="true">
+          <div class="hp-field">
             <label for="website">Leave this field empty</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
           </div>
 
-          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          <p class="form-status" id="form-status" role="status"></p>
 
           <button type="submit" class="btn btn-primary btn-block" id="submit-review">
             Post review
