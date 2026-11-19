@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <title>FAST Food Feedback</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <img
+          class="brand-logo"
+          src="path6.svg"
+          alt="FAST Food Feedback logo"
+          width="50"
+          height="50" />
+        <span class="brand-text">
+          <strong>FAST Food Feedback</strong>
+          <span>FAST-NUCES Karachi</span>
+        </span>
+      </div>
+      <p class="mode-badge" id="data-mode" hidden>Demo mode: mock data</p> <!--remove before shipping-->
+    </div>
+
+    <nav class="site-nav" aria-label="Page sections">
+      <div class="wrap">
+        <ul>
+          <li><a href="#top-rated">Top rated</a></li>
+          <li><a href="#browse">All Items</a></li>
+          <li><a href="#outlets">Outlets</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap">
+      <h1 id="hero-title">Rate the food you try.</h1>
+      <p class="hero-text">
+        Know what is worth it and what's not,<br>Before you spend.
+      </p>
+      <p class="hero-stats" id="hero-stats">Loading campus menu...</p>
+    </section>
+
+    
+    <section class="section wrap" id="top-rated">
+      <div class="section-head">
+        <h2 id="top-rated-title">Top rated on campus</h2>
+        <p class="section-sub">The Top 3 Items as of Right Now.</p>
+      </div>
+      <div class="top-scroll" id="top-rated-list"></div>
+    </section>
+
+    
+    <section class="section wrap" id="browse">
+      <div class="section-head">
+        <h2 id="browse-title">Browse the menu</h2>
+        <p class="section-sub">Search by item or Search by filters</p>
+      </div>
+
+      <form class="filters" id="filters" role="search" novalidate>
+        <div class="field search-field">
+          <label for="search-input">Search items</label>
+          <input
+            type="search"
+            id="search-input"
+            name="search"
+            placeholder="e.g. biryani, chai, shawarma"
+            autocomplete="off"/>
+          <p class="field-help" id="search-help">Results update as you type. </p>
+        </div>
+
+        <!-- Collapsible on phones, opened automatically on wider screens. -->
+        <details class="filter-details" id="filter-details">
+          <summary>Filters and sorting</summary>
+
+          <div class="filter-grid">
+            <div class="field">
+              <label for="category-filter">Category</label>
+              <select id="category-filter" name="category">
+                <option value="all">All categories</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="price-filter">Maximum price</label>
+              <select id="price-filter" name="maxPrice">
+                <option value="0">Any price</option>
+                <option value="100">Up to Rs 100</option>
+                <option value="200">Up to Rs 200</option>
+                <option value="350">Up to Rs 350</option>
+                <option value="500">Up to Rs 500</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="sort-filter">Sort by</label>
+              <select id="sort-filter" name="sort">
+                <option value="rating">Highest rated</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+            </div>
+
+            <div class="field reset-field">
+              <button type="button" class="btn btn-ghost" id="reset-filters">Reset filters</button>
+            </div>
+          </div>
+        </details>
+
+        <p class="results-count" id="results-count" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- ================= OUTLETS ================= -->
+    <section class="section wrap" id="outlets" aria-labelledby="outlets-title">
+      <div class="section-head">
+        <h2 id="outlets-title">Outlets</h2>
+        <p class="section-sub">Pick an outlet to see only its menu.</p>
+      </div>
+      <div class="outlet-grid" id="outlet-list" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= MENU ================= -->
+    <section class="section wrap" id="menu" aria-labelledby="menu-title">
+      <div class="section-head">
+        <h2 id="menu-title">All items</h2>
+        <p class="section-sub" id="menu-sub">Every item from every outlet.</p>
+      </div>
+      <div class="item-grid" id="item-list" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section class="section wrap about" id="about" aria-labelledby="about-title">
+      <h2 id="about-title">How it works</h2>
+      <div class="about-grid">
+        <article class="about-card">
+          <h3>Shared, item-level reviews</h3>
+          <p>
+            Every review is stored in the campus database, so what you write is
+            what the next student sees. Ratings are for a single item, not for a
+            whole outlet.
+          </p>
+        </article>
+        <article class="about-card">
+          <h3>One review per item per device</h3>
+          <p>
+            Your browser creates a random device ID. It stops accidental double
+            posting and keeps the averages honest. It is not a login system, so
+            it reduces spam rather than eliminating it.
+          </p>
+        </article>
+        <article class="about-card">
+          <h3>Prices are student-reported</h3>
+          <p>
+            Outlet names, menu items and prices in this demo are placeholders.
+            Check the printed menu at the counter before you trust a price.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>
+        <strong>Campus Bites</strong> - a student project for FAST-NUCES Karachi.
+        Ratings are opinions, not official information.
+      </p>
+      <p class="footer-small">Built with plain HTML, CSS and JavaScript. No login, no tracking.</p>
+    </div>
+  </footer>
+
+  <!-- ================= ITEM DIALOG ================= -->
+  <dialog class="dialog" id="item-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-inner">
+      <button type="button" class="dialog-close" id="dialog-close" aria-label="Close item details">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <header class="dialog-head">
+        <p class="eyebrow" id="dialog-outlet">Outlet</p>
+        <h2 id="dialog-title">Item name</h2>
+        <p class="dialog-meta" id="dialog-meta">Category &middot; Price</p>
+        <p class="dialog-rating" id="dialog-rating">No ratings yet</p>
+      </header>
+
+      <section class="reviews-section" aria-labelledby="reviews-title">
+        <h3 id="reviews-title">Student reviews</h3>
+        <ul class="review-list" id="review-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="form-section" aria-labelledby="form-title">
+        <h3 id="form-title">Add your review</h3>
+        <p class="form-note">Your name and review are public. One review per item per device.</p>
+
+        <form id="review-form" novalidate>
+          <input type="hidden" name="item_id" id="review-item-id" value="" />
+
+          <fieldset class="rating-field">
+            <legend>Your rating <span class="req" aria-hidden="true">*</span></legend>
+            <div class="star-input">
+              <input type="radio" name="rating" id="rating-5" value="5" />
+              <label for="rating-5"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">5 stars</span></label>
+
+              <input type="radio" name="rating" id="rating-4" value="4" />
+              <label for="rating-4"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">4 stars</span></label>
+
+              <input type="radio" name="rating" id="rating-3" value="3" />
+              <label for="rating-3"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">3 stars</span></label>
+
+              <input type="radio" name="rating" id="rating-2" value="2" />
+              <label for="rating-2"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">2 stars</span></label>
+
+              <input type="radio" name="rating" id="rating-1" value="1" />
+              <label for="rating-1"><span class="star-glyph" aria-hidden="true">&#9733;</span><span class="sr-only">1 star</span></label>
+            </div>
+            <p class="field-error" id="rating-error" role="alert"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="reviewer-name">Your name <span class="req" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="reviewer-name"
+              name="reviewer_name"
+              maxlength="30"
+              autocomplete="nickname"
+              required
+              aria-describedby="name-help name-error" />
+            <p class="field-help" id="name-help">2 to 30 characters. Shown next to your review.</p>
+            <p class="field-error" id="name-error" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="review-text">Your review <span class="optional">(optional)</span></label>
+            <textarea
+              id="review-text"
+              name="review_text"
+              rows="3"
+              maxlength="300"
+              aria-describedby="review-help review-error"></textarea>
+            <p class="field-help" id="review-help"><span id="review-count">0</span>/300 characters.</p>
+            <p class="field-error" id="review-error" role="alert"></p>
+          </div>
+
+          <!-- Honeypot: hidden from humans, tempting for bots. -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submit-review">
+            Post review
+          </button>
+        </form>
+      </section>
+    </div>
+  </dialog>
+
+  <noscript>
+    <p class="noscript">Campus Bites needs JavaScript to load the menu and reviews.</p>
+  </noscript>
+
+  <!-- Load order matters: config, then API, then rendering helpers, then the app. -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

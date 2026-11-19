@@ -1,0 +1,586 @@
+{
+  "name": "Campus Bites API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "campus-food/outlets",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w-outlets",
+      "name": "Webhook - GET outlets",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "a1b2c3d4-0001-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT o.id, o.name, o.type, o.location, COUNT(i.id)::int AS item_count FROM outlets o LEFT JOIN items i ON i.outlet_id = o.id GROUP BY o.id ORDER BY o.name",
+        "options": {}
+      },
+      "id": "db-outlets",
+      "name": "DB - select outlets",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Wrap the SQL rows in the standard API envelope.\nconst data = $input.all().map((item) => item.json);\nreturn [{ json: { success: true, data, error: null } }];"
+      },
+      "id": "resp-outlets",
+      "name": "Response - outlets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "send-outlets",
+      "name": "Respond - outlets",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 0]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "campus-food/items",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w-items",
+      "name": "Webhook - GET items",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 200],
+      "webhookId": "a1b2c3d4-0002-4000-8000-000000000002"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT i.id, i.name, i.category, i.price, o.id AS outlet_id, o.name AS outlet_name, COUNT(r.id)::int AS review_count, COALESCE(ROUND(AVG(r.rating)::numeric, 1), 0)::float8 AS average_rating FROM items i JOIN outlets o ON o.id = i.outlet_id LEFT JOIN reviews r ON r.item_id = i.id WHERE ($1::int = 0 OR i.outlet_id = $1::int) GROUP BY i.id, o.id ORDER BY i.name",
+        "options": {
+          "queryReplacement": "={{ [ $json.query.outlet_id || 0 ] }}"
+        }
+      },
+      "id": "db-items",
+      "name": "DB - select items",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [220, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Wrap the SQL rows in the standard API envelope.\nconst data = $input.all().map((item) => item.json);\nreturn [{ json: { success: true, data, error: null } }];"
+      },
+      "id": "resp-items",
+      "name": "Response - items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "send-items",
+      "name": "Respond - items",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 200]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "campus-food/reviews",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w-reviews",
+      "name": "Webhook - GET reviews",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 400],
+      "webhookId": "a1b2c3d4-0003-4000-8000-000000000003"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT r.id, r.item_id, r.reviewer_name, r.rating, r.review_text, r.created_at FROM reviews r WHERE r.item_id = $1::int ORDER BY r.created_at DESC",
+        "options": {
+          "queryReplacement": "={{ [ $json.query.item_id || 0 ] }}"
+        }
+      },
+      "id": "db-reviews",
+      "name": "DB - select reviews",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [220, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Note: device_id is intentionally NOT selected - it is private.\nconst data = $input.all().map((item) => item.json);\nreturn [{ json: { success: true, data, error: null } }];"
+      },
+      "id": "resp-reviews",
+      "name": "Response - reviews",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "send-reviews",
+      "name": "Respond - reviews",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 400]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "campus-food/top-rated",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w-top",
+      "name": "Webhook - GET top rated",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 600],
+      "webhookId": "a1b2c3d4-0004-4000-8000-000000000004"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT i.id, i.name, i.category, i.price, o.id AS outlet_id, o.name AS outlet_name, COUNT(r.id)::int AS review_count, ROUND(AVG(r.rating)::numeric, 1)::float8 AS average_rating FROM items i JOIN outlets o ON o.id = i.outlet_id JOIN reviews r ON r.item_id = i.id GROUP BY i.id, o.id HAVING COUNT(r.id) >= 1 ORDER BY average_rating DESC, review_count DESC, i.name LIMIT $1::int",
+        "options": {
+          "queryReplacement": "={{ [ 5 ] }}"
+        }
+      },
+      "id": "db-top",
+      "name": "DB - top rated",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [220, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.all().map((item) => item.json);\nreturn [{ json: { success: true, data, error: null } }];"
+      },
+      "id": "resp-top",
+      "name": "Response - top rated",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "send-top",
+      "name": "Respond - top rated",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 600]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "campus-food/reviews",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w-create",
+      "name": "Webhook - POST review",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 900],
+      "webhookId": "a1b2c3d4-0005-4000-8000-000000000005"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Server-side validation. The browser checks the form too, but a bot can\n// skip the browser entirely, so every rule is repeated here.\nconst body = $input.first().json.body || {};\nconst text = (value) => (typeof value === 'string' ? value.trim() : '');\n\nconst itemId = Number(body.item_id);\nconst rating = Number(body.rating);\nconst name = text(body.reviewer_name);\nconst review = text(body.review_text);\nconst deviceId = text(body.device_id);\nconst errors = [];\n\n// Honeypot: a real student never sees or fills this field.\nif (text(body.website) !== '') {\n  return [{ json: { valid: false, error: 'Submission rejected.' } }];\n}\n\nif (!Number.isInteger(itemId) || itemId <= 0) errors.push('A valid item is required.');\nif (!Number.isInteger(rating) || rating < 1 || rating > 5) errors.push('Rating must be a whole number from 1 to 5.');\nif (name.length < 2 || name.length > 30) errors.push('Name must be 2-30 characters.');\nif (review.length > 300) errors.push('Review must be 300 characters or fewer.');\nif (!/^[A-Za-z0-9-]{8,64}$/.test(deviceId)) errors.push('device_id is missing or invalid.');\n\nif (errors.length > 0) {\n  return [{ json: { valid: false, error: errors.join(' ') } }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    error: null,\n    review: {\n      item_id: itemId,\n      rating,\n      reviewer_name: name,\n      review_text: review,\n      device_id: deviceId,\n    },\n  },\n}];"
+      },
+      "id": "validate",
+      "name": "Validate review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 900]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "valid-check",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "IF valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json.error || 'Please check your input and try again.';\nreturn [{ json: { success: false, data: null, error } }];"
+      },
+      "id": "resp-invalid",
+      "name": "Response - invalid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 780]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "send-invalid",
+      "name": "Respond - 400 invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [880, 780]
+    },
+
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*)::int AS count FROM reviews WHERE device_id = $1::text AND created_at > now() - interval '1 hour'",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate review').first().json.review.device_id ] }}"
+        }
+      },
+      "id": "db-ratelimit",
+      "name": "DB - reviews last hour",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [660, 980]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "rate-limit-check",
+              "leftValue": "={{ Number($json.count) }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-ratelimit",
+      "name": "IF over rate limit",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [880, 980]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, data: null, error: 'Too many reviews from this device. Please try again later.' } }];"
+      },
+      "id": "resp-ratelimit",
+      "name": "Response - rate limited",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 880]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 429
+        }
+      },
+      "id": "send-ratelimit",
+      "name": "Respond - 429 rate limit",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 880]
+    },
+
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT EXISTS (SELECT 1 FROM reviews WHERE item_id = $1::int AND device_id = $2::text) AS exists",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate review').first().json.review.item_id, $('Validate review').first().json.review.device_id ] }}"
+        }
+      },
+      "id": "db-duplicate",
+      "name": "DB - check duplicate",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1100, 1080]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "duplicate-check",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-duplicate",
+      "name": "IF already reviewed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1320, 1080]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, data: null, error: 'You have already reviewed this item from this device.' } }];"
+      },
+      "id": "resp-duplicate",
+      "name": "Response - duplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 980]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 409
+        }
+      },
+      "id": "send-duplicate",
+      "name": "Respond - 409 duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1760, 980]
+    },
+
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO reviews (item_id, reviewer_name, rating, review_text, device_id) VALUES ($1::int, $2::text, $3::smallint, $4::text, $5::text) RETURNING id, item_id, reviewer_name, rating, review_text, created_at",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate review').first().json.review.item_id, $('Validate review').first().json.review.reviewer_name, $('Validate review').first().json.review.rating, $('Validate review').first().json.review.review_text, $('Validate review').first().json.review.device_id ] }}"
+        }
+      },
+      "id": "db-insert",
+      "name": "DB - insert review",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1540, 1180]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT i.id, i.name, i.category, i.price, o.id AS outlet_id, o.name AS outlet_name, COUNT(r.id)::int AS review_count, COALESCE(ROUND(AVG(r.rating)::numeric, 1), 0)::float8 AS average_rating FROM items i JOIN outlets o ON o.id = i.outlet_id LEFT JOIN reviews r ON r.item_id = i.id WHERE i.id = $1::int GROUP BY i.id, o.id",
+        "options": {
+          "queryReplacement": "={{ [ $('DB - insert review').first().json.item_id ] }}"
+        }
+      },
+      "id": "db-summary",
+      "name": "DB - item summary",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1760, 1180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send back the new review AND the recalculated item summary so the UI can\n// update the average immediately without a second request.\nconst review = $('DB - insert review').first().json;\nconst item = $input.first().json;\nreturn [{ json: { success: true, data: { review, item }, error: null } }];"
+      },
+      "id": "resp-created",
+      "name": "Response - created",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1980, 1180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "send-created",
+      "name": "Respond - 201 created",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2200, 1180]
+    }
+  ],
+  "connections": {
+    "Webhook - GET outlets": {
+      "main": [[{ "node": "DB - select outlets", "type": "main", "index": 0 }]]
+    },
+    "DB - select outlets": {
+      "main": [[{ "node": "Response - outlets", "type": "main", "index": 0 }]]
+    },
+    "Response - outlets": {
+      "main": [[{ "node": "Respond - outlets", "type": "main", "index": 0 }]]
+    },
+
+    "Webhook - GET items": {
+      "main": [[{ "node": "DB - select items", "type": "main", "index": 0 }]]
+    },
+    "DB - select items": {
+      "main": [[{ "node": "Response - items", "type": "main", "index": 0 }]]
+    },
+    "Response - items": {
+      "main": [[{ "node": "Respond - items", "type": "main", "index": 0 }]]
+    },
+
+    "Webhook - GET reviews": {
+      "main": [[{ "node": "DB - select reviews", "type": "main", "index": 0 }]]
+    },
+    "DB - select reviews": {
+      "main": [[{ "node": "Response - reviews", "type": "main", "index": 0 }]]
+    },
+    "Response - reviews": {
+      "main": [[{ "node": "Respond - reviews", "type": "main", "index": 0 }]]
+    },
+
+    "Webhook - GET top rated": {
+      "main": [[{ "node": "DB - top rated", "type": "main", "index": 0 }]]
+    },
+    "DB - top rated": {
+      "main": [[{ "node": "Response - top rated", "type": "main", "index": 0 }]]
+    },
+    "Response - top rated": {
+      "main": [[{ "node": "Respond - top rated", "type": "main", "index": 0 }]]
+    },
+
+    "Webhook - POST review": {
+      "main": [[{ "node": "Validate review", "type": "main", "index": 0 }]]
+    },
+    "Validate review": {
+      "main": [[{ "node": "IF valid", "type": "main", "index": 0 }]]
+    },
+    "IF valid": {
+      "main": [
+        [{ "node": "DB - reviews last hour", "type": "main", "index": 0 }],
+        [{ "node": "Response - invalid", "type": "main", "index": 0 }]
+      ]
+    },
+    "Response - invalid": {
+      "main": [[{ "node": "Respond - 400 invalid", "type": "main", "index": 0 }]]
+    },
+    "DB - reviews last hour": {
+      "main": [[{ "node": "IF over rate limit", "type": "main", "index": 0 }]]
+    },
+    "IF over rate limit": {
+      "main": [
+        [{ "node": "Response - rate limited", "type": "main", "index": 0 }],
+        [{ "node": "DB - check duplicate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Response - rate limited": {
+      "main": [[{ "node": "Respond - 429 rate limit", "type": "main", "index": 0 }]]
+    },
+    "DB - check duplicate": {
+      "main": [[{ "node": "IF already reviewed", "type": "main", "index": 0 }]]
+    },
+    "IF already reviewed": {
+      "main": [
+        [{ "node": "Response - duplicate", "type": "main", "index": 0 }],
+        [{ "node": "DB - insert review", "type": "main", "index": 0 }]
+      ]
+    },
+    "Response - duplicate": {
+      "main": [[{ "node": "Respond - 409 duplicate", "type": "main", "index": 0 }]]
+    },
+    "DB - insert review": {
+      "main": [[{ "node": "DB - item summary", "type": "main", "index": 0 }]]
+    },
+    "DB - item summary": {
+      "main": [[{ "node": "Response - created", "type": "main", "index": 0 }]]
+    },
+    "Response - created": {
+      "main": [[{ "node": "Respond - 201 created", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
