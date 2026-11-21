@@ -11,6 +11,9 @@ const CONFIG = {
    */
   USE_MOCK_DATA: true,
 
+  SUPABASE_URL: 'https://kkphrgjlxrcrhsgfhvhb.supabase.co',
+  SUPABSE_PUBLISHABLE_KEY: 'sb_publishable_5fgh4nPbrWbpEzbDtogvHA_dc9pvJDU',
+
   /** Paste the production webhook URLs from n8n here (see n8n/n8n-setup.md). */
   API: {
     outlets: 'http://YOUR-N8N-HOST:5678/webhook/campus-food/outlets',

@@ -127,17 +127,14 @@ const Api = (() => {
   // ------------------------------------------------------------------------
   // Real network helper
   // ------------------------------------------------------------------------
-  async function request(url, { method = 'GET', body } = {}) {
-    if (url.includes('YOUR-N8N-HOST')) {
-      throw new Error('Set your n8n webhook URLs in js/config.js (or turn mock mode back on).');
-    }
+  async function request(SUPABASE_URL, { method = 'GET', body } = {}) {
 
     // AbortController prevents a request from hanging forever.
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(SUPABASE_URL, {
         method,
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,
@@ -194,7 +191,12 @@ const Api = (() => {
         .filter((item) => !outletId || item.outlet_id === outletId)
         .map(mockItem);
     }
-    return request(`${CONFIG.API.items}?outlet_id=${encodeURIComponent(outletId)}`);
+    let query = sb.from('items').select('item_name', 'item_rating', 'cafe_id', 'price');
+    if (outletId) query = query.eq('cafe_id', outletId);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
   }
 
   async function getReviews(itemId) {
