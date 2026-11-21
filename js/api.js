@@ -12,6 +12,8 @@
    ========================================================================== */
 
 const Api = (() => {
+
+  const sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABSE_PUBLISHABLE_KEY);
   // ------------------------------------------------------------------------
   // Mock data (a shortened copy of database/seed.sql)
   // ------------------------------------------------------------------------
@@ -127,17 +129,14 @@ const Api = (() => {
   // ------------------------------------------------------------------------
   // Real network helper
   // ------------------------------------------------------------------------
-  async function request(url, { method = 'GET', body } = {}) {
-    if (url.includes('YOUR-N8N-HOST')) {
-      throw new Error('Set your n8n webhook URLs in js/config.js (or turn mock mode back on).');
-    }
+  async function request(SUPABASE_URL, { method = 'GET', body } = {}) {
 
     // AbortController prevents a request from hanging forever.
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(SUPABASE_URL, {
         method,
         headers: body ? { 'Content-Type': 'application/json' } : undefined,
         body: body ? JSON.stringify(body) : undefined,
@@ -184,7 +183,15 @@ const Api = (() => {
         item_count: MOCK.items.filter((item) => item.outlet_id === outlet.id).length
       }));
     }
-    return request(CONFIG.API.outlets);
+    let query = sb.from('cafeterias').select('cafe_name, cafe_rating, cafe_loc');
+    const { data, error } = await query;
+    if(error) throw error;
+    return data.map((o) => ({
+      id: o.cafe_id,
+      name: o.cafe_name,
+      rating: o.cafe_rating,
+      location: o.cafe_loc
+    }));
   }
 
   async function getItems(outletId = 0) {
@@ -194,7 +201,22 @@ const Api = (() => {
         .filter((item) => !outletId || item.outlet_id === outletId)
         .map(mockItem);
     }
-    return request(`${CONFIG.API.items}?outlet_id=${encodeURIComponent(outletId)}`);
+    else{
+      let query = sb.from('items').select('item_name, item_rating, cafe_id, price');
+      if (outletId) query = query.eq('cafe_id', outletId);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data.map((i) => ({
+        id: i.item_id,
+        name: i.item_name,
+        price: i.price,
+        outlet_id: i.cafe_id,
+        outlet_name: i.cafeterias?.name ?? '',
+        average_rating: i.item_rating,
+        review_count: 0   
+      }));
+    }
   }
 
   async function getReviews(itemId) {

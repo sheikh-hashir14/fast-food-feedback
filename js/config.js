@@ -9,7 +9,10 @@ const CONFIG = {
    * true  -> use the built-in mock data in api.js (no n8n, no internet).
    * false -> call the n8n webhooks below.
    */
-  USE_MOCK_DATA: true,
+  USE_MOCK_DATA: false,
+
+  SUPABASE_URL: 'https://kkphrgjlxrcrhsgfhvhb.supabase.co',
+  SUPABSE_PUBLISHABLE_KEY: 'sb_publishable_5fgh4nPbrWbpEzbDtogvHA_dc9pvJDU',
 
   /** Paste the production webhook URLs from n8n here (see n8n/n8n-setup.md). */
   API: {
