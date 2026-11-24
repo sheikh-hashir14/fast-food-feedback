@@ -222,14 +222,14 @@ const UI = (() => {
       id: outlet.id,
       name: outlet.name,
       typeLabel: outlet.type,
-      detail: `${outlet.location} \u00b7 ${outlet.item_count} item${Number(outlet.item_count) === 1 ? '' : 's'}`
+      detail: `${outlet.location} \n ${outlet.item_count} item${Number(outlet.item_count) === 1 ? '' : 's'}`
     }))];
 
     cards.forEach((card) => {
       const pressed = Number(activeId) === Number(card.id);
       const button = el('button', {
         className: 'outlet-card',
-        attrs: { type: 'button', 'aria-pressed': pressed ? 'true' : 'false' }
+        attrs: { type: 'button' }
       }, [
         el('span', { className: 'outlet-name', text: card.name }),
         el('span', { className: 'outlet-type', text: card.typeLabel }),
