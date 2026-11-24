@@ -17,7 +17,7 @@ const Api = (() => {
     return{
       id: r.review_id,
       item: r.items?.item_name??'',
-      cafe: r.cafes?.cafe_name??'',
+      cafe: r.cafeterias?.cafe_name??'',
       rating: r.rating,
       text: r.review_text
     }
@@ -26,7 +26,7 @@ const Api = (() => {
   async function getOutlets(){
     const {data, error} = await supabase
       .from('cafeterias')
-      .select('cafe_id, cafe_name, rating, cafe_loc');
+      .select('cafe_id, cafe_name, cafe_rating, cafe_loc');
     
     if(error) throw error;
 
@@ -54,7 +54,12 @@ const Api = (() => {
   async function getReviews(itemId){
     const {data, error} = await supabase
       .from('reviews')
-      .select('review_id, items(item_name), cafes(cafe_name), rating, review_text');
+      .select('review_id, items(item_name), cafeterias(cafe_name), rating, review_text')
+      .eq('item_id', itemId)
+      .order('submitted_at', {ascending: false});
+
+      if(error) throw error;
+
       return data.map(mapReview); 
   }
 
@@ -62,7 +67,7 @@ const Api = (() => {
     const {data, error} = await supabase
       .from('items')
       .select('item_id, item_name, price, item_rating, cafeterias(cafe_name)')
-      .not('item_rating', 'is, null')
+      .not('item_rating', 'is', null)
       .order('item_rating', {ascending: false})
       .limit(CONFIG.TOP_RATED_LIMIT);
     
@@ -73,15 +78,15 @@ const Api = (() => {
   async function createReview(payload){
     const rating = Number(payload.rating);
     
-    if(rating > 5 || rating < 1) throw new error("Rating Must be between 1 and 5.");
+    if(rating > 5 || rating < 1) throw new Error("Rating Must be between 1 and 5.");
 
     const itemID = Number(payload.item_id);
     const {data:item, error:itemError} = await supabase
       .from('items')
-      .select('item_id, item_name, price')
+      .select('item_id, item_name, price, cafe_id')
       .eq('item_id', itemID)
-      .single;
-    if(itemError) throw new error("Sorry, This Item no longer Exists");
+      .single();
+    if(itemError) throw new Error("Sorry, This Item no longer Exists");
 
     const {data:review, error} = await supabase
       .from('reviews')
@@ -91,7 +96,7 @@ const Api = (() => {
         rating,
         review_text: String(payload.review_text || '').trim()
       })
-      .select('review_id, items(item_name), cafes(cafe_name), rating, review_text')
+      .select('review_id, items(item_name), cafeterias(cafe_name), rating, review_text')
       .single();
     if(error) throw error;
 
