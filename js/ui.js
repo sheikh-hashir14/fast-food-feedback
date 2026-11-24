@@ -1,12 +1,3 @@
-/* ==========================================================================
-   ui.js
-   Everything that touches the DOM for display lives here. app.js decides
-   *what* to show, ui.js decides *how* to show it.
-
-   Security rule: user text only ever goes through textContent / `text`, never
-   innerHTML. That is why a review containing "<script>alert(1)</script>" is
-   displayed as plain text instead of running.
-   ========================================================================== */
 
 const UI = (() => {
   // Cached elements. This script is loaded at the end of <body>, so they exist.
@@ -103,13 +94,9 @@ const UI = (() => {
     });
   }
 
-  // ------------------------------------------------------------------------
-  // Shared pieces
-  // ------------------------------------------------------------------------
-  /** Stars + "4.2 (13)". The stars are decorative; the number is the data. */
-  function ratingRow(average, count) {
+
+    function ratingRow(average) {
     const rating = Number(average) || 0;
-    const reviews = Number(count) || 0;
     const filled = Math.round(rating);
     const stars = el('span', { className: 'stars', attrs: { 'aria-hidden': 'true' } });
 
@@ -120,10 +107,8 @@ const UI = (() => {
       }));
     }
 
-    const visibleValue = reviews > 0 ? `${rating.toFixed(1)} (${reviews})` : 'No ratings yet';
-    const spokenValue = reviews > 0
-      ? `Rated ${rating.toFixed(1)} out of 5 from ${reviews} review${reviews === 1 ? '' : 's'}`
-      : 'No ratings yet';
+    const visibleValue = rating > 0 ? rating.toFixed(1) : 'No ratings yet';
+    const spokenValue = rating > 0 ? `Rated ${rating.toFixed(1)} out of 5` : 'No ratings yet';
 
     return el('span', { className: 'rating' }, [
       stars,
@@ -221,8 +206,8 @@ const UI = (() => {
     const cards = [allOutlets, ...outlets.map((outlet) => ({
       id: outlet.id,
       name: outlet.name,
-      typeLabel: outlet.type,
-      detail: `${outlet.location} \n ${outlet.item_count} item${Number(outlet.item_count) === 1 ? '' : 's'}`
+      typeLabel: outlet.rating ? `\u2605 ${Number(outlet.rating).toFixed(1)}` : 'No ratings yet',
+      detail: outlet.location || ''
     }))];
 
     cards.forEach((card) => {
@@ -266,8 +251,8 @@ const UI = (() => {
         el('h3', { text: item.name }),
         el('p', { className: 'item-price', text: formatPrice(item.price) })
       ]),
-      el('p', { className: 'item-meta', text: `${item.outlet_name} \u00b7 ${item.category}` }),
-      ratingRow(item.average_rating, item.review_count),
+      el('p', { className: 'item-meta', text: item.cafe }),
+      ratingRow(item.rating),
       button
     ]);
   }
@@ -320,9 +305,9 @@ const UI = (() => {
       dom.topList.append(el('article', { className: 'card top-card' }, [
         el('span', { className: 'rank', text: `#${index + 1} top rated` }),
         el('h3', { text: item.name }),
-        el('p', { className: 'item-outlet', text: item.outlet_name }),
+        el('p', { className: 'item-outlet', text: item.cafe }),
         el('p', { className: 'price', text: formatPrice(item.price) }),
-        ratingRow(item.average_rating, item.review_count),
+        ratingRow(item.rating),
         button
       ]));
     });
@@ -332,15 +317,15 @@ const UI = (() => {
   // Dialog
   // ------------------------------------------------------------------------
   function updateDialogHeader(item) {
-    dom.dialogOutlet.textContent = item.outlet_name;
+    dom.dialogOutlet.textContent = item.cafe;
     dom.dialogTitle.textContent = item.name;
-    dom.dialogMeta.textContent = `${item.category} \u00b7 ${formatPrice(item.price)}`;
+    dom.dialogMeta.textContent = formatPrice(item.price);
 
     clear(dom.dialogRating);
-    if (Number(item.review_count) > 0) {
+    if (Number(item.rating) > 0) {
       dom.dialogRating.append(
         document.createTextNode('Average rating: '),
-        ratingRow(item.average_rating, item.review_count)
+        ratingRow(item.rating)
       );
     } else {
       dom.dialogRating.textContent = 'No ratings yet - be the first!';
@@ -372,7 +357,7 @@ const UI = (() => {
   // ------------------------------------------------------------------------
   function reviewItem(review) {
     const name = String(review.reviewer_name || 'Student').trim() || 'Student';
-    const text = String(review.review_text || '');
+    const text = String(review.text || '');
     const rating = Number(review.rating) || 0;
     const stars = '\u2605'.repeat(rating) + '\u2606'.repeat(Math.max(0, 5 - rating));
 
@@ -380,8 +365,7 @@ const UI = (() => {
       el('div', { className: 'review-head' }, [
         el('span', { className: 'review-avatar', attrs: { 'aria-hidden': 'true' }, text: name.charAt(0).toUpperCase() }),
         el('div', { className: 'review-who' }, [
-          el('p', { className: 'review-name', text: name }),
-          el('p', { className: 'review-date', text: formatDate(review.created_at) })
+          el('p', { className: 'review-name', text: name })
         ]),
         el('span', { className: 'review-stars', attrs: { 'aria-hidden': 'true' }, text: stars }),
         el('span', { className: 'sr-only', text: `${rating} out of 5 stars` })
