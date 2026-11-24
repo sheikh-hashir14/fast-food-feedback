@@ -80,7 +80,7 @@ const Api = (() => {
     
     if(rating > 5 || rating < 1) throw new Error("Rating Must be between 1 and 5.");
 
-    const itemID = Number(payload.item_id);
+    const itemID = payload.item_id;
     const {data:item, error:itemError} = await supabase
       .from('items')
       .select('item_id, item_name, price, cafe_id')
