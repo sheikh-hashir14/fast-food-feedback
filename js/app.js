@@ -31,9 +31,7 @@
     name: (a, b) => a.name.localeCompare(b.name)
   };
 
-  // ------------------------------------------------------------------------
-  // Small storage helpers (private browsing can block localStorage)
-  // ------------------------------------------------------------------------
+
   function readStorage(key) {
     try {
       return localStorage.getItem(key);
@@ -50,7 +48,7 @@
     }
   }
 
-  /** A random id so one browser cannot review the same item twice. */
+
   function getOrCreateDeviceId() {
     const stored = readStorage(CONFIG.STORAGE.deviceIdKey);
     if (stored && /^[A-Za-z0-9-]{8,64}$/.test(stored)) return stored;
@@ -173,8 +171,7 @@
   }
 
   async function loadItems(outletId) {
-    // Every request gets a number; only the newest one is allowed to render.
-    // This prevents a slow reply for outlet A overwriting a newer outlet B.
+
     const requestId = ++state.itemsRequestId;
     state.items = [];
 
@@ -229,7 +226,7 @@
   // Outlets and menu
   // ------------------------------------------------------------------------
   function selectOutlet(outletId) {
-    state.activeOutletId = Number(outletId);
+    state.activeOutletId = outletId;
 
     // A category or price limit chosen for the previous menu may not exist in
     // the new one, so start from a clean scope. The search box is kept because
@@ -256,7 +253,7 @@
       return;
     }
 
-    const outlet = state.outlets.find((entry) => Number(entry.id) === state.activeOutletId);
+    const outlet = state.outlets.find((entry) => entry.id === state.activeOutletId);
     UI.setMenuHeading(
       outlet ? outlet.name : 'Menu',
       outlet ? `Menu from ${outlet.name}.` : 'Menu for the selected outlet.'
@@ -445,7 +442,7 @@
   /** Keep the card in the menu in sync after a new review. */
   function updateItem(updatedItem) {
     state.items = state.items.map((item) =>
-      Number(item.id) === Number(updatedItem.id) ? { ...item, ...updatedItem } : item
+      item.id === updatedItem.id ? { ...item, ...updatedItem } : item
     );
     renderFilteredItems();
   }
