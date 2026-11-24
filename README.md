@@ -343,23 +343,8 @@ Google Form, then cleaned and imported into Supabase. To keep it accurate:
 8. **Automated tests** for the SQL queries, RLS policies and the `add_review`
    function.
 
-## 15. Group/viva notes
 
-- The three layers are deliberately separate: `api.js` (network), `ui.js`
-  (rendering), `app.js` (state and events). Ask "where would you add a new
-  filter?" - `app.js` state + `ui.js` markup only, no changes to `api.js`.
-- `textContent`, never `innerHTML`, is the answer to "how do you stop XSS?".
-- The average is calculated by SQL, not stored, so it can never disagree with
-  the reviews.
-- The rate limit is SQL-based (`created_at > now() - interval '1 hour'`) inside
-  the `add_review` function, so it cannot be skipped by calling the API
-  directly, unlike a JavaScript-only counter.
-- Row Level Security is the answer to "the anon key is public, so what protects
-  the data?".
-- `AbortController` gives the fetch a timeout so a dead backend does not leave
-  the UI loading forever.
 
 ---
 
-**License:** free to use for coursework and campus projects. Update the data
-before reusing it for another campus.
+
