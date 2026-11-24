@@ -211,7 +211,7 @@ const UI = (() => {
     }))];
 
     cards.forEach((card) => {
-      const pressed = Number(activeId) === Number(card.id);
+      const pressed = Number(activeId) === String(card.id);
       const button = el('button', {
         className: 'outlet-card',
         attrs: { type: 'button' }
