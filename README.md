@@ -2,7 +2,7 @@
 
 Item-level food ratings and reviews for campus outlets at **FAST-NUCES Karachi**.
 
-Students can see which cafeteria or dhaba item is actually worth the money, rate
+Students can look up which cafeteria or dhaba item is actually worth the money, rate
 it 1-5 stars, and leave a short written review that every other student sees.
 
 > **Data source:** The outlets, menu items and initial reviews come from a survey of FAST-NUCES students collected with a Google Form and imported into
