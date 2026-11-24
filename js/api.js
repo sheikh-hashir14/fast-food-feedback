@@ -86,6 +86,7 @@ const Api = (() => {
       .select('item_id, item_name, price, cafe_id')
       .eq('item_id', itemID)
       .single();
+    console.log('item lookup failed:', itemError, 'payload:', payload);
     if(itemError) throw new Error("Sorry, This Item no longer Exists");
 
     const {data:review, error} = await supabase
