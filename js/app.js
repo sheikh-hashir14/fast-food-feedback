@@ -1,8 +1,4 @@
-/* ==========================================================================
-   app.js
-   The "brain": keeps the current state, listens to events, calls Api and then
-   asks UI to redraw. No rendering code and no fetch calls in this file.
-   ========================================================================== */
+
 
 (() => {
   // ------------------------------------------------------------------------
@@ -28,8 +24,7 @@
   /** Comparators for the "Sort by" select. */
   const SORTS = {
     rating: (a, b) =>
-      Number(b.average_rating) - Number(a.average_rating) ||
-      Number(b.review_count) - Number(a.review_count) ||
+      Number(b.rating) - Number(a.rating) ||
       a.name.localeCompare(b.name),
     'price-asc': (a, b) => Number(a.price) - Number(b.price) || a.name.localeCompare(b.name),
     'price-desc': (a, b) => Number(b.price) - Number(a.price) || a.name.localeCompare(b.name),
@@ -317,7 +312,7 @@
         if (!query) return true;
         return (
           item.name.toLowerCase().includes(query) ||
-          item.outlet_name.toLowerCase().includes(query)
+          item.cafe.toLowerCase().includes(query)
         );
       })
       .sort(SORTS[state.sort] || SORTS.rating);
